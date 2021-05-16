@@ -3,7 +3,16 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  config: {
+    logo: '/assets/img/logo.png',
+    title: 'DBlogger',
+    subtitle:
+      'Decentralized Blogging Platform. Powered by ethereum, swarm & ipfs',
+    copyright: {
+      test: 'designed and developped by The Codacus',
+    },
+  },
 };
 
 /*

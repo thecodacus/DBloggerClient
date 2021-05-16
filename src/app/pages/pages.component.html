@@ -1,1 +1,48 @@
-<p>pages works!</p>
+<div class="container">
+  <mat-toolbar color="primary" class="mat-elevation-z8 nav-bar">
+    <button
+      mat-button
+      aria-label="Example icon-button with menu icon"
+      [routerLink]="'/'"
+    >
+      <!-- <mat-icon>menu</mat-icon> -->
+      <span>{{ blog.env.config.title }}</span>
+    </button>
+    <button *ngFor="let menu of blog.menus" mat-button [routerLink]="menu.path">
+      <!-- <mat-icon>menu</mat-icon> -->
+      <span>{{ menu.name }}</span>
+    </button>
+
+    <span class="spacer"></span>
+    <button
+      *ngIf="blog.currentProfile | async as profile"
+      mat-button
+      aria-label="Example icon-button with share icon"
+      [routerLink]="'/author/' + profile.id"
+    >
+      <span>{{ profile.name }}</span>
+    </button>
+    <ng-container *ngFor="let menu of blog.secondaryMenu | async">
+      <button *ngIf="menu.type == 'path'" mat-button [routerLink]="menu.path">
+        <span>{{ menu.name }}</span>
+      </button>
+      <button
+        *ngIf="menu.type == 'event'"
+        mat-raised-button
+        color="accent"
+        (click)="blogEvent(menu.event)"
+      >
+        {{ menu.name }}
+      </button>
+    </ng-container>
+  </mat-toolbar>
+  <mat-drawer-container class="drawer-container">
+    <!-- <mat-drawer mode="side" opened>Drawer content</mat-drawer> -->
+    <div class="content-drawer">
+      <div class="content">
+        <router-outlet></router-outlet>
+      </div>
+      <footer class="primary-color"></footer>
+    </div>
+  </mat-drawer-container>
+</div>

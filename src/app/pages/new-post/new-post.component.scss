@@ -1,0 +1,13 @@
+.container {
+  margin-top: 5rem;
+  app-editor {
+    display: block;
+    max-width: 720px;
+    background-color: white;
+    margin: auto;
+    padding: 3rem;
+    color: black;
+    border-radius: 5px;
+    z-index: 4;
+  }
+}

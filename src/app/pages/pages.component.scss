@@ -1,0 +1,30 @@
+.spacer {
+  flex: 1 1 auto;
+}
+.mat-toolbar-row,
+.mat-toolbar-single-row {
+  height: 3.5rem;
+}
+.nav-bar {
+  z-index: 8;
+}
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  .drawer-container {
+    flex: 1;
+    .content-drawer {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      .content {
+        flex: 1;
+        margin-bottom: 2rem;
+      }
+      footer {
+        min-height: 2rem;
+      }
+    }
+  }
+}

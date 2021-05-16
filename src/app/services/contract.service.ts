@@ -52,18 +52,9 @@ export class ContractService {
         hover: 'rgb(16, 26, 32)',
       },
     });
-    this.connect()
-      .then((x) => {
-        console.log(x);
-        let vals = this.web3.eth.getAccounts();
-        return vals;
-      })
-      .then((x) => {
-        console.log(x);
-      });
   }
   isConnected() {
-    this.connected.asObservable();
+    return this.connected.asObservable();
   }
   getConnectedWallets() {
     this.wallet.asObservable();
@@ -82,6 +73,7 @@ export class ContractService {
       let addresses = await this.web3.eth.requestAccounts();
       this.selectedAddress = addresses[0];
       this.wallet.next(addresses);
+      this.selectedAddress$.next(this.selectedAddress);
     } catch (err) {
       return { success: false, msg: err.message };
     }
@@ -96,10 +88,15 @@ export class ContractService {
         contractJson.networks[networkID].address
       );
       this.connected.next(true);
-      return { success: true };
     } catch (err) {
       return { success: false, msg: err.message };
     }
+    try {
+      await this.connectBzz();
+    } catch (err) {
+      console.log(err);
+    }
+    return { success: true };
   }
   disconnect() {
     this.provider = null;
@@ -146,7 +143,7 @@ export class ContractService {
     return await this.getUserProfile(this.selectedAddress);
   }
   async getAllUserProfile(): Promise<IUser[]> {
-    let users: IUser[] = await this.contract.methods
+    let resp: { 0: IUser[]; 1: number } = await this.contract.methods
       .getAllUser()
       .call({ from: this.selectedAddress })
       .catch((err) => {
@@ -157,21 +154,23 @@ export class ContractService {
         return null;
       });
 
-    if (users == undefined) return [];
-    users = await Promise.all(
-      users.map(async (user) => {
-        try {
-          user.profile = JSON.parse(await this.getData(user.profile_hash));
-        } catch (err) {
-          console.log(err);
-        }
-        return user;
-      })
+    if (resp == undefined) return [];
+    let users = await Promise.all(
+      resp[0]
+        .filter((x) => x.isValue)
+        .map(async (user) => {
+          try {
+            user.profile = JSON.parse(await this.getData(user.profile_hash));
+          } catch (err) {
+            console.log(err);
+          }
+          return user;
+        })
     );
     return users;
   }
   async getAllAuthorProfile(): Promise<IUser[]> {
-    let authors: IUser[] = await this.contract.methods
+    let resp: { 0: IUser[]; 1: number } = await this.contract.methods
       .getAllPostAuthor()
       .call({ from: this.selectedAddress })
       .catch((err) => {
@@ -181,16 +180,20 @@ export class ContractService {
         console.log(error);
         return null;
       });
-    if (authors == undefined) return [];
-    authors = await Promise.all(
-      authors.map(async (author) => {
-        try {
-          author.profile = JSON.parse(await this.getData(author.profile_hash));
-        } catch (err) {
-          console.log(err);
-        }
-        return author;
-      })
+    if (resp == undefined) return [];
+    let authors = await Promise.all(
+      resp[0]
+        .filter((x) => x.isValue)
+        .map(async (author) => {
+          try {
+            author.profile = JSON.parse(
+              await this.getData(author.profile_hash)
+            );
+          } catch (err) {
+            console.log(err);
+          }
+          return author;
+        })
     );
     return authors;
   }
@@ -214,7 +217,7 @@ export class ContractService {
     return post;
   }
   async getAllPosts(): Promise<IBlogPost[]> {
-    let posts: IBlogPost[] = await this.contract.methods
+    let resp: { 0: IBlogPost[]; 1: number } = await this.contract.methods
       .getAllPost()
       .call({ from: this.selectedAddress })
       .catch((err) => {
@@ -224,16 +227,18 @@ export class ContractService {
         console.log(error);
         return null;
       });
-    if (posts == undefined) return posts;
-    posts = await Promise.all(
-      posts.map(async (post) => {
-        try {
-          post.content = JSON.parse(await this.getData(post.content_hash));
-        } catch (err) {
-          console.log(err);
-        }
-        return post;
-      })
+    if (resp == undefined) return null;
+    let posts: IBlogPost[] = await Promise.all(
+      resp[0]
+        .filter((x) => x.isValue)
+        .map(async (post) => {
+          try {
+            post.content = JSON.parse(await this.getData(post.content_hash));
+          } catch (err) {
+            console.log(err);
+          }
+          return post;
+        })
     );
     return posts;
   }

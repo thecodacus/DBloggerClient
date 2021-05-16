@@ -1,1 +1,16 @@
-<p>home works!</p>
+<div class="hero">
+  <div class="blogmeta">
+    <div class="title">{{ blogSvc.env.config.title }}</div>
+    <div class="subtitle">{{ blogSvc.env.config.subtitle }}</div>
+  </div>
+</div>
+<mat-divider></mat-divider>
+
+<div class="blogs-container">
+  <div class="blog-item" *ngFor="let author of authors | async">
+    {{ author.name }}
+  </div>
+  <div class="blog-item" *ngFor="let blog of blogs | async">
+    {{ blog.id }}
+  </div>
+</div>
