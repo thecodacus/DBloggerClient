@@ -75,6 +75,7 @@ export class ContractService {
       this.connected.next(false);
       return { success: false, msg: 'No Provider' };
     }
+
     this.web3.setProvider(this.provider);
     // this.web3.eth.getAccounts().then(console.log);
     try {
@@ -94,6 +95,7 @@ export class ContractService {
         contractJson.abi,
         contractJson.networks[networkID].address
       );
+      this.connected.next(true);
       return { success: true };
     } catch (err) {
       return { success: false, msg: err.message };
